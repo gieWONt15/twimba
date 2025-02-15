@@ -59,7 +59,7 @@ function handleTweetBtnClick(){
     if(tweetInput.value){
         tweetsData.unshift({
             handle: `@Scrimba`,
-            profilePic: `./images/scrimbalogo.png`,
+            profilePic: `/images/scrimbalogo.png`,
             likes: 0,
             retweets: 0,
             tweetText: tweetInput.value,
@@ -83,7 +83,7 @@ function handleReplyBtnClick(tweetId) {
     
     targetTweetObj.replies.unshift({
         handle: '@Scrimba',
-        profilePic: './images/scrimbalogo.png',
+        profilePic: '/images/scrimbalogo.png',
         tweetText: replyInput.value
     })
     render()
