@@ -14,8 +14,11 @@ document.addEventListener('click', function(e){
     else if(e.target.id === 'tweet-btn'){
         handleTweetBtnClick()
     }
-    else if(e.target.id === 'reply-btn') {
+    else if(e.target.id === 'reply-btn'){
         handleReplyBtnClick(e.target.dataset.replybtn)
+    }
+    else if(e.target.dataset.delete){
+        handleDeleteBtn(e.target.dataset.delete)
     }
 })
 
@@ -59,7 +62,7 @@ function handleTweetBtnClick(){
     if(tweetInput.value){
         tweetsData.unshift({
             handle: `@Scrimba`,
-            profilePic: `/public/images/scrimbalogo.png`,
+            profilePic: `images/scrimbalogo.png`,
             likes: 0,
             retweets: 0,
             tweetText: tweetInput.value,
@@ -81,11 +84,21 @@ function handleReplyBtnClick(tweetId) {
     
     const replyInput = document.getElementById('reply-input-' + tweetId)
     
-    targetTweetObj.replies.unshift({
+    targetTweetObj.replies.push({
         handle: '@Scrimba',
-        profilePic: '/public/images/scrimbalogo.png',
+        profilePic: 'images/scrimbalogo.png',
         tweetText: replyInput.value
     })
+    render()
+}
+
+function handleDeleteBtn(tweetId) {
+    const targetTweetObj = tweetsData.filter(function(tweet){
+        return tweet.uuid === tweetId
+    })[0]
+
+    tweetsData.splice(tweetsData.indexOf(targetTweetObj), tweetsData.indexOf(targetTweetObj) + 1)
+    
     render()
 }
 
@@ -138,6 +151,7 @@ function getFeedHtml(){
         <img src="${tweet.profilePic}" class="profile-pic">
         <div>
             <p class="handle">${tweet.handle}</p>
+            <button class="delete-tweet" data-delete="${tweet.uuid}">X</button>
             <p class="tweet-text">${tweet.tweetText}</p>
             <div class="tweet-details">
                 <span class="tweet-detail">

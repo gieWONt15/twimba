@@ -71,6 +71,16 @@ button{
     font-weight: 600;
 }
 
+.delete-tweet {
+    background-color: red;
+    border: 1px solid black;
+    color: black;
+    border-radius: 50%;
+    width: 20px;
+    font-size: 12px;
+    padding: 0;
+}
+
 /* tweet */
 
 .tweet{
