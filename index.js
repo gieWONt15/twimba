@@ -1,5 +1,13 @@
-import { tweetsData } from './data.js'
-import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
+// import { tweetsData } from './data.js'
+let tweetsData = []
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
+
+const storedTweets = JSON.parse(localStorage.getItem('tweetsData'))
+if (storedTweets) {
+    tweetsData.length = 0
+    tweetsData.push(...storedTweets)
+}
+
 
 document.addEventListener('click', function(e){
     if(e.target.dataset.like){
@@ -60,7 +68,7 @@ function handleTweetBtnClick(){
     const tweetInput = document.getElementById('tweet-input')
 
     if(tweetInput.value){
-        tweetsData.unshift({
+        const tweet = {
             handle: `@Scrimba`,
             profilePic: `images/scrimbalogo.png`,
             likes: 0,
@@ -70,9 +78,13 @@ function handleTweetBtnClick(){
             isLiked: false,
             isRetweeted: false,
             uuid: uuidv4()
-        })
-    render()
-    tweetInput.value = ''
+        }
+        tweetsData.unshift(tweet)
+
+        localStorage.setItem(`tweetsData`, JSON.stringify(tweetsData))
+
+        render()
+        tweetInput.value = ''
     }
 
 }
@@ -82,7 +94,7 @@ function handleReplyBtnClick(tweetId) {
         return tweet.uuid === tweetId
     })[0]
     
-    const replyInput = document.getElementById('reply-input-' + tweetId)
+    const replyInput = document.getElementById(`reply-input-${tweetId}`)
     
     targetTweetObj.replies.push({
         handle: '@Scrimba',
@@ -97,8 +109,10 @@ function handleDeleteBtn(tweetId) {
         return tweet.uuid === tweetId
     })[0]
 
+    localStorage.removeItem(`tweet-${tweetId}`)
+
     tweetsData.splice(tweetsData.indexOf(targetTweetObj), tweetsData.indexOf(targetTweetObj) + 1)
-    
+
     render()
 }
 
@@ -106,17 +120,15 @@ function getFeedHtml(){
     let feedHtml = ``
     
     tweetsData.forEach(function(tweet){
+        localStorage.setItem(`tweet-${tweet.uuid}`, JSON.stringify(tweet))
         
         let repliesHtml = ``
         let likeIconClass = ''
         let retweetIconClass = ''
-
         
         if (tweet.isLiked){
             likeIconClass = 'liked'
         }
-        
-        
         
         if (tweet.isRetweeted){
             retweetIconClass = 'retweeted'
@@ -132,56 +144,56 @@ function getFeedHtml(){
         
         tweet.replies.forEach(function(reply){
             repliesHtml+=    
-`
-<div class="tweet-reply">
-    <div class="tweet-inner">
-        <img src="${reply.profilePic}" class="profile-pic">
-            <div>
-                <p class="handle">${reply.handle}</p>
-                <p class="tweet-text"">${reply.tweetText}</p>
-            </div>
-        </div>
-</div>
-`
+                `
+                <div class="tweet-reply">
+                    <div class="tweet-inner">
+                        <img src="${reply.profilePic}" class="profile-pic">
+                            <div>
+                                <p class="handle">${reply.handle}</p>
+                                <p class="tweet-text"">${reply.tweetText}</p>
+                            </div>
+                        </div>
+                </div>
+                `
             })
 
         feedHtml += `
-<div class="tweet">
-    <div class="tweet-inner">
-        <img src="${tweet.profilePic}" class="profile-pic">
-        <div>
-            <p class="handle">${tweet.handle}</p>
-            <button class="delete-tweet" data-delete="${tweet.uuid}">X</button>
-            <p class="tweet-text">${tweet.tweetText}</p>
-            <div class="tweet-details">
-                <span class="tweet-detail">
-                    <i class="fa-regular fa-comment-dots"
-                    data-reply="${tweet.uuid}"
-                    ></i>
-                    ${tweet.replies.length}
-                </span>
-                <span class="tweet-detail">
-                    <i class="fa-solid fa-heart ${likeIconClass}"
-                    data-like="${tweet.uuid}"
-                    ></i>
-                    ${tweet.likes}
-                </span>
-                <span class="tweet-detail">
-                    <i class="fa-solid fa-retweet ${retweetIconClass}"
-                    data-retweet="${tweet.uuid}"
-                    ></i>
-                    ${tweet.retweets}
-                </span>
+            <div class="tweet">
+                <div class="tweet-inner">
+                    <img src="${tweet.profilePic}" class="profile-pic">
+                    <div>
+                        <p class="handle">${tweet.handle}</p>
+                        <button class="delete-tweet" data-delete="${tweet.uuid}">X</button>
+                        <p class="tweet-text">${tweet.tweetText}</p>
+                        <div class="tweet-details">
+                            <span class="tweet-detail">
+                                <i class="fa-regular fa-comment-dots"
+                                data-reply="${tweet.uuid}"
+                                ></i>
+                                ${tweet.replies.length}
+                            </span>
+                            <span class="tweet-detail">
+                                <i class="fa-solid fa-heart ${likeIconClass}"
+                                data-like="${tweet.uuid}"
+                                ></i>
+                                ${tweet.likes}
+                            </span>
+                            <span class="tweet-detail">
+                                <i class="fa-solid fa-retweet ${retweetIconClass}"
+                                data-retweet="${tweet.uuid}"
+                                ></i>
+                                ${tweet.retweets}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden" id="replies-${tweet.uuid}">
+                    ${repliesHtml}
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="hidden" id="replies-${tweet.uuid}">
-        ${repliesHtml}
-    </div>
-</div>
-`
-   })
-   return feedHtml
+            `
+    })
+        return feedHtml
 }
 
 function render(){
