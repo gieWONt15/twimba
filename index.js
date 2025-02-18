@@ -1,13 +1,5 @@
-// import { tweetsData } from './data.js'
-let tweetsData = []
+import { tweetsData } from './data.js'
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
-
-const storedTweets = JSON.parse(localStorage.getItem('tweetsData'))
-if (storedTweets) {
-    tweetsData.length = 0
-    tweetsData.push(...storedTweets)
-}
-
 
 document.addEventListener('click', function(e){
     if(e.target.dataset.like){
@@ -81,7 +73,7 @@ function handleTweetBtnClick(){
         }
         tweetsData.unshift(tweet)
 
-        localStorage.setItem(`tweetsData`, JSON.stringify(tweetsData))
+        localStorage.setItem(`tweet-${tweet.uuid}`, JSON.stringify(tweet))
 
         render()
         tweetInput.value = ''
@@ -118,10 +110,10 @@ function handleDeleteBtn(tweetId) {
 
 function getFeedHtml(){
     let feedHtml = ``
-    
+
     tweetsData.forEach(function(tweet){
-        localStorage.setItem(`tweet-${tweet.uuid}`, JSON.stringify(tweet))
-        
+        console.log(localStorage.getItem(tweet))
+
         let repliesHtml = ``
         let likeIconClass = ''
         let retweetIconClass = ''
